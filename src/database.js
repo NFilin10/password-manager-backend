@@ -35,8 +35,21 @@ const createTablesQuery = `
         "service_name" VARCHAR(255) NOT NULL,
         "link" varchar(255),
         "login" VARCHAR(255) NOT NULL,
+        "password" VARCHAR(255) NOT NULL,
+        "logo" VARCHAR(255) NOT NULL
+    );
+    
+    CREATE TABLE IF NOT EXISTS "users" (
+        "id" SERIAL PRIMARY KEY,
+        "username" VARCHAR(100) NOT NULL,
+        "email" VARCHAR(255) NOT NULL,
         "password" VARCHAR(255) NOT NULL
-    );`;
+    );
+
+    `;
+
+
+
 
 // A function to execute the create tables query
 execute(createTablesQuery).then(result => {

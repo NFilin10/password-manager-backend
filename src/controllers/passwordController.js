@@ -15,8 +15,8 @@ const addPassword = async (req, res) => {
 
     try {
         await pool.query(
-            "INSERT INTO passwords (service_name, link, login, password) VALUES ($1, $2, $3, $4)",
-            [data.website, data.webLink, data.login, data.password]
+            "INSERT INTO passwords (service_name, link, login, password, logo) VALUES ($1, $2, $3, $4, $5)",
+            [data.website, data.webLink, data.login, data.password, (data.logo).toLowerCase()]
         );
         res.status(201).json({ message: 'Password added successfully' });
     } catch (error) {
