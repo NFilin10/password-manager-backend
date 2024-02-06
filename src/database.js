@@ -59,6 +59,14 @@ const createTablesQuery = `
         FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE
     );
     
+    CREATE TABLE IF NOT EXISTS "password_categories" (
+        "id" SERIAL PRIMARY KEY,
+        "password_id" INT NOT NULL,
+        "category_id" INT NOT NULL,
+        FOREIGN KEY ("password_id") REFERENCES "passwords" ("id") ON DELETE CASCADE,
+        FOREIGN KEY ("category_id") REFERENCES "categories" ("id") ON DELETE CASCADE
+);
+    
     `;
 
 
