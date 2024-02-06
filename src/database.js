@@ -36,7 +36,8 @@ const createTablesQuery = `
         "link" varchar(255),
         "login" VARCHAR(255) NOT NULL,
         "password" VARCHAR(255) NOT NULL,
-        "logo" VARCHAR(255) NOT NULL
+        "logo" VARCHAR(255) NOT NULL,
+        "score" DECIMAL
     );
     
     CREATE TABLE IF NOT EXISTS "users" (

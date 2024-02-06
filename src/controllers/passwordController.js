@@ -1,6 +1,37 @@
 const express = require('express');
 const pool = require("../database");
 
+
+function passwordStrength(password) {
+    let points = 0;
+    if (password.length > 12) {
+        points += 2;
+    } else if (password.length > 6) {
+        points += 1;
+    }
+
+    if (/[A-Z]/.test(password)) {
+        points += 1;
+    }
+
+    if (/[a-z]/.test(password)) {
+        points += 1;
+    }
+
+    if (/\d/.test(password)) {
+        points += 1;
+    }
+
+    if (/\W/.test(password)) {
+        points += 1;
+    }
+
+    const totalPoints = 7;
+
+    return (points / totalPoints) * 100;
+}
+
+
 const getPasswords = async (req, res) => {
     console.log("A GET all request has arrived");
     try {
@@ -13,9 +44,9 @@ const getPasswords = async (req, res) => {
 
         // Group passwords by password id and collect categories into an array
         const groupedPasswords = passwords.rows.reduce((acc, row) => {
-            const { id, service_name, link, login, password, logo, category_id, category_name } = row;
+            const { id, service_name, link, login, password, logo, category_id, category_name, score } = row;
             if (!acc[id]) {
-                acc[id] = { id, service_name, link, login, password, logo, categories: [] };
+                acc[id] = { id, service_name, link, login, password, logo, categories: [], score };
             }
             if (category_id) {
                 acc[id].categories.push({ category_id, category_name });
@@ -36,10 +67,12 @@ const addPassword = async (req, res) => {
     console.log("BODY:", req.body);
     const data = req.body;
 
+    const score = passwordStrength(data.password);
+
     try {
         const passwordInsertResult = await pool.query(
-            "INSERT INTO passwords (service_name, link, login, password, logo) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-            [data.website, data.webLink, data.login, data.password, (data.logo).toLowerCase()]
+            "INSERT INTO passwords (service_name, link, login, password, logo, score) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+            [data.website, data.webLink, data.login, data.password, (data.logo).toLowerCase(), Math.round(score)]
         );
 
         const passwordID = passwordInsertResult.rows[0].id;
