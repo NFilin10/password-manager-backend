@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors')
 const passwordsRoute = require('./routes/passwords.route')
 const authRoute = require('./routes/auth.route')
+const categoryRoute = require('./routes/category.route')
+
 const cookieParser = require('cookie-parser');
 
 const port = process.env.PORT || 8080;
@@ -17,6 +19,8 @@ app.use(cookieParser());
 
 app.use('/', passwordsRoute);
 app.use('/auth/', authRoute);
+app.use('/', categoryRoute);
+
 
 
 
