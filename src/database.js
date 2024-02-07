@@ -29,7 +29,14 @@ const execute = async (...queries) => {
 };
 
 const createTablesQuery = `
-  
+    
+    CREATE TABLE IF NOT EXISTS "users" (
+        "id" SERIAL PRIMARY KEY,
+        "username" VARCHAR(100) NOT NULL,
+        "email" VARCHAR(255) NOT NULL,
+        "password" VARCHAR(255) NOT NULL
+    );
+    
     CREATE TABLE IF NOT EXISTS "passwords" (
         "id" SERIAL PRIMARY KEY,
         "service_name" VARCHAR(255) NOT NULL,
@@ -37,14 +44,10 @@ const createTablesQuery = `
         "login" VARCHAR(255) NOT NULL,
         "password" VARCHAR(700) NOT NULL,
         "logo" VARCHAR(255) NOT NULL,
-        "score" DECIMAL
-    );
-    
-    CREATE TABLE IF NOT EXISTS "users" (
-        "id" SERIAL PRIMARY KEY,
-        "username" VARCHAR(100) NOT NULL,
-        "email" VARCHAR(255) NOT NULL,
-        "password" VARCHAR(255) NOT NULL
+        "score" DECIMAL,
+        "user_id" INT NOT NULL,
+        FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE
+
     );
 
     CREATE TABLE IF NOT EXISTS "categories" (

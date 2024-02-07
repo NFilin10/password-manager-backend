@@ -83,7 +83,8 @@ const getPasswords = async (req, res) => {
             `SELECT p.*, c.id AS category_id, c.category_name
              FROM passwords p
              LEFT JOIN password_categories pc ON p.id = pc.password_id
-             LEFT JOIN categories c ON pc.category_id = c.id`
+             LEFT JOIN categories c ON pc.category_id = c.id
+             WHERE p.user_id = $1`, [userID]
         );
 
         // Group passwords by password id and collect categories into an array
@@ -131,8 +132,8 @@ const addPassword = async (req, res) => {
     try {
 
         const passwordInsertResult = await pool.query(
-            "INSERT INTO passwords (service_name, link, login, password, logo, score) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-            [data.website, data.webLink, data.login, encrtptedPass, (data.logo).toLowerCase(), Math.round(score)]
+            "INSERT INTO passwords (service_name, link, login, password, logo, score, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+            [data.website, data.webLink, data.login, encrtptedPass, (data.logo).toLowerCase(), Math.round(score), userID]
         );
 
         const passwordID = passwordInsertResult.rows[0].id;
@@ -160,8 +161,24 @@ const addPassword = async (req, res) => {
 }
 
 
+const deletePassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log("delete a post request hasarrived");
+        const deletepost = await pool.query(
+            "DELETE FROM passwords WHERE id = $1", [id]
+        );
+        res.json(deletepost);
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
+
+
 
 module.exports = {
     getPasswords,
-    addPassword
+    addPassword,
+    deletePassword
 };
