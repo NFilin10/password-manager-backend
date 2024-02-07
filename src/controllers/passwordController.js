@@ -1,5 +1,39 @@
 const express = require('express');
 const pool = require("../database");
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
+const secret = "gdgdhdbcb770785rgdzqws";
+
+const decodeJWT = (token) => {
+    try {
+        const decoded = jwt.verify(token, secret);
+        return decoded.id; // Extract the id from the decoded token
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+    }
+};
+
+function encryptPassword(text, masterPassword) {
+    const salt = crypto.randomBytes(16);
+    const key = crypto.pbkdf2Sync(masterPassword, salt, 100000, 32, 'sha512');
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    encrypted = salt.toString('hex') + encrypted + iv.toString('hex'); // Convert salt and iv to hex strings
+    return encrypted;
+}
+
+
+function decryptPassword(encryptedData, salt, iv, masterPassword) {
+    const key = crypto.pbkdf2Sync(masterPassword, Buffer.from(salt, 'hex'), 100000, 32, 'sha512');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, Buffer.from(iv, 'hex'));
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
+
 
 
 function passwordStrength(password) {
@@ -34,6 +68,16 @@ function passwordStrength(password) {
 
 const getPasswords = async (req, res) => {
     console.log("A GET all request has arrived");
+
+    const token = req.cookies.jwt;
+    const userID = decodeJWT(token)
+    console.log(userID)
+
+    const user = await pool.query("SELECT * FROM users WHERE id = $1", [userID]);
+    if (user.rows.length === 0) return res.status(401).json({ error: "User is not registered" });
+
+    const userPass = user.rows[0].password
+
     try {
         const passwords = await pool.query(
             `SELECT p.*, c.id AS category_id, c.category_name
@@ -46,7 +90,11 @@ const getPasswords = async (req, res) => {
         const groupedPasswords = passwords.rows.reduce((acc, row) => {
             const { id, service_name, link, login, password, logo, category_id, category_name, score } = row;
             if (!acc[id]) {
-                acc[id] = { id, service_name, link, login, password, logo, categories: [], score };
+                const salt = password.slice(0, 32); // Extract salt from the encrypted password
+                const iv = password.slice(-32); // Extract IV from the encrypted password
+                const encryptedData = password.slice(32, -32); // Extract encrypted data
+                const decryptedPass = decryptPassword(encryptedData, salt, iv, userPass);
+                acc[id] = { id, service_name, link, login, decryptedPass, logo, categories: [], score };
             }
             if (category_id) {
                 acc[id].categories.push({ category_id, category_name });
@@ -63,16 +111,28 @@ const getPasswords = async (req, res) => {
 
 
 
+
 const addPassword = async (req, res) => {
     console.log("BODY:", req.body);
     const data = req.body;
 
+    const token = req.cookies.jwt;
+    const userID = decodeJWT(token)
+
+    const user = await pool.query("SELECT * FROM users WHERE id = $1", [userID]);
+    if (user.rows.length === 0) return res.status(401).json({ error: "User is not registered" });
+
+    const userPass = user.rows[0].password
+
+    const encrtptedPass = encryptPassword(data.password, userPass)
+
     const score = passwordStrength(data.password);
 
     try {
+
         const passwordInsertResult = await pool.query(
             "INSERT INTO passwords (service_name, link, login, password, logo, score) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-            [data.website, data.webLink, data.login, data.password, (data.logo).toLowerCase(), Math.round(score)]
+            [data.website, data.webLink, data.login, encrtptedPass, (data.logo).toLowerCase(), Math.round(score)]
         );
 
         const passwordID = passwordInsertResult.rows[0].id;
