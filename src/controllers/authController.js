@@ -66,7 +66,7 @@ const login = async(req, res) => {
         const token = await generateJWT(user.rows[0].id);
         res
             .status(201)
-            .cookie("accessToken", token, {
+            .cookie("jwt", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
                 overwrite: true,
