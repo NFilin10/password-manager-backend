@@ -1,11 +1,12 @@
 
 const express = require('express')
-const { getPasswords, addPassword, deletePassword } = require('../controllers/passwordController')
+const { getPasswords, addPassword, deletePassword, updatePassword } = require('../controllers/passwordController')
 const router = express.Router()
 
 router.get('/', getPasswords)
 router.post('/add', addPassword)
 router.delete('/delete/:id', deletePassword)
+router.put('/update/:id', updatePassword)
 
 
 

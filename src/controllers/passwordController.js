@@ -174,11 +174,66 @@ const deletePassword = async (req, res) => {
     }
 }
 
+const updatePassword = async (req, res) => {
+    const { id } = req.params; // Assuming id is passed in the URL parameters
+    const data = req.body;
+
+    const token = req.cookies.jwt;
+    const userID = decodeJWT(token);
+
+    const user = await pool.query("SELECT * FROM users WHERE id = $1", [userID]);
+    if (user.rows.length === 0) return res.status(401).json({ error: "User is not registered" });
+
+    const userPass = user.rows[0].password
+
+    const encrtptedPass = encryptPassword(data.password, userPass)
+
+    const score = passwordStrength(data.password);
+
+    try {
+        // Check if the password belongs to the user before updating
+        const password = await pool.query("SELECT * FROM passwords WHERE id = $1 AND user_id = $2", [id, userID]);
+        if (password.rows.length === 0) return res.status(404).json({ error: "Password not found or does not belong to the user" });
+
+        // Update the password fields
+        const updateResult = await pool.query(
+            "UPDATE passwords SET service_name = $1, link = $2, login = $3, password = $4, logo = $5, score = $6 WHERE id = $7",
+            [data.website, data.webLink, data.login, encrtptedPass, (data.logo).toLowerCase(), Math.round(score), id]
+        );
+
+        // Handle categories update if needed
+        if (data.categories && data.categories.length > 0) {
+            // Delete existing associations
+            await pool.query("DELETE FROM password_categories WHERE password_id = $1", [id]);
+
+            // Insert new associations
+            for (const categoryName of data.categories) {
+                const categoryQueryResult = await pool.query(
+                    "SELECT id FROM categories WHERE category_name = $1",
+                    [categoryName.category_name]
+                );
+
+                const categoryID = categoryQueryResult.rows[0].id;
+
+                await pool.query(
+                    "INSERT INTO password_categories (password_id, category_id) VALUES ($1, $2)",
+                    [id, categoryID]
+                );
+            }
+        }
+
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error updating password:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
 
 
 
 module.exports = {
     getPasswords,
     addPassword,
-    deletePassword
+    deletePassword,
+    updatePassword
 };
