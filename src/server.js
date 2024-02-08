@@ -12,7 +12,7 @@ const port = process.env.PORT || 8080;
 const app = express();
 
 
-app.use(cors({ origin: 'https://password-manager-frontend-ten.vercel.app:3000', credentials: true }));
+app.use(cors({ origin: 'https://password-manager-frontend-ten.vercel.app/:3000', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
