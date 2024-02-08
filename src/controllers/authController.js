@@ -26,7 +26,17 @@ const authenticate = async (req, res) => {
         console.error(err.message);
     }
 
-    res.send({ authenticated });
+    res
+        .status(201)
+        .cookie("jwt", token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+            overwrite: true,
+            sameSite: "none",
+            secure: true
+        })
+        .send({ authenticated });
+
 };
 
 
