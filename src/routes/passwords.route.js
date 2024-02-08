@@ -5,10 +5,10 @@ const authenticateMiddleware = require('./../middlewares/authenticate.middleware
 
 const router = express.Router()
 
-router.get('/', getPasswords)
-router.post('/add', addPassword)
-router.delete('/delete/:id', deletePassword)
-router.put('/update/:id', updatePassword)
+router.get('/', authenticateMiddleware, getPasswords)
+router.post('/add', authenticateMiddleware, addPassword)
+router.delete('/delete/:id', authenticateMiddleware, deletePassword)
+router.put('/update/:id', authenticateMiddleware, updatePassword)
 
 
 
