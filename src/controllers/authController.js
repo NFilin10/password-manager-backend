@@ -27,13 +27,7 @@ const authenticate = async (req, res) => {
     }
 
     res
-        .cookie("jwt", token, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000,
-            overwrite: true,
-            sameSite: "lax",
-            secure: true
-        }).status(201).send({ authenticated });
+       .status(201).send({ authenticated });
 
 };
 
