@@ -74,7 +74,7 @@ const getPasswords = async (req, res) => {
     console.log(userID)
 
     const user = await pool.query("SELECT * FROM users WHERE id = $1", [userID]);
-    if (user.rows.length === 0) return res.status(401).json({ error: "User is not registered" });
+    if (user.rows.length === 0) return res.status(401).json({ error: "User is not registered" , userID: userID});
 
     const userPass = user.rows[0].password
 
