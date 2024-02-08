@@ -16,22 +16,27 @@ const decodeJWT = (token) => {
 };
 
 const getCategory = async (req, res) => {
-
     const token = req.cookies.jwt;
     console.log("TOKEN", token)
 
     const userID = decodeJWT(token)
 
     const categories = await pool.query(
-        `SELECT c."category_name"
-             FROM "user_categories" uc
-             JOIN "categories" c ON uc."id" = c."id"
-             WHERE uc."user_id" = $1`,
+        `SELECT c."id" as category_id, c."category_name",
+                COUNT(pc."password_id") as password_count
+         FROM "user_categories" uc
+         JOIN "categories" c ON uc."category_id" = c."id"
+         LEFT JOIN "password_categories" pc ON c."id" = pc."category_id"
+         LEFT JOIN "passwords" p ON pc."password_id" = p."id"
+         WHERE uc."user_id" = $1
+         GROUP BY c."id", c."category_name"`,
         [userID]
     );
+
     res.json(categories.rows);
     console.log("HERE", categories.rows)
 }
+
 
 const addCategory = async (req, res) => {
     console.log("BODY:", req.body);
