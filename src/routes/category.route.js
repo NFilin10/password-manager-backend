@@ -7,8 +7,8 @@ const authenticateMiddleware = require('./../middlewares/authenticate.middleware
 console.log('getCategory function:', getCategory); // Add this line for debugging
 
 
-router.get('/categories', authenticateMiddleware, getCategory)
-router.post('/new-category', authenticateMiddleware, addCategory)
+router.get('/categories', getCategory)
+router.post('/new-category', addCategory)
 
 
 module.exports = router;
