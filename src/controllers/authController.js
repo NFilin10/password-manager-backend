@@ -78,7 +78,7 @@ const login = async(req, res) => {
                 sameSite: "lax",
                 secure: true
             })
-            .json({ user_id: user.rows[0].id }).status(201).send();
+            .json({ user_id: user.rows[0].id }).status(201);
     } catch (error) {
         res.status(401).json({ error: error.message });
     }
