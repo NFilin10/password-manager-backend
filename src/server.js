@@ -27,7 +27,9 @@ app.use('/', categoryRoute);
 
 
 
-app.listen(port, () => {
-    console.log("Server is listening to port " + port)
+const server = app.listen(port, () => {
+    console.log("Server is listening to port " + port);
 });
+
+module.exports = server;
 
