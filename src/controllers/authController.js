@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 
 
-const secret = "gdgdhdbcb770785rgdzqws";
+const secret = process.env.SECRET
 const maxAge = 60 * 600;
 
 const generateJWT = (id) => {

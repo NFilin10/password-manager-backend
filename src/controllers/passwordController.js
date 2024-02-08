@@ -2,7 +2,7 @@ const express = require('express');
 const pool = require("../database");
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const secret = "gdgdhdbcb770785rgdzqws";
+const secret = process.env.SECRET
 
 const decodeJWT = (token) => {
     try {
