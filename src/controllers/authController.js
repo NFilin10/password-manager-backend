@@ -50,7 +50,7 @@ const signup = async(req, res) => {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
                 overwrite: true,
-                sameSite: "lax",
+                sameSite: "none",
                 secure: true
             })
             .json({ user_id: user.rows[0].id }).status(201).send();
@@ -75,7 +75,7 @@ const login = async(req, res) => {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
                 overwrite: true,
-                sameSite: "lax",
+                sameSite: "none",
                 secure: true
             })
             .json({ user_id: user.rows[0].id }).status(201);
