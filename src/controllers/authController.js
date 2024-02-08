@@ -27,15 +27,13 @@ const authenticate = async (req, res) => {
     }
 
     res
-        .status(201)
         .cookie("jwt", token, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
             overwrite: true,
             sameSite: "none",
             secure: true
-        })
-        .send({ authenticated });
+        }).status(201).send({ authenticated });
 
 };
 
@@ -54,7 +52,6 @@ const signup = async(req, res) => {
         );
         const token = await generateJWT(authUser.rows[0].id); // generates a JWT by taking the user id as an input (payload)
         res
-            .status(201)
             .cookie("jwt", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
@@ -62,8 +59,7 @@ const signup = async(req, res) => {
                 sameSite: "none",
                 secure: true
             })
-            .json({ user_id: user.rows[0].id })
-            .send();
+            .json({ user_id: user.rows[0].id }).status(201).send();
     } catch (err) {
         console.error(err.message);
         res.status(400).send(err.message);
@@ -81,7 +77,6 @@ const login = async(req, res) => {
 
         const token = await generateJWT(user.rows[0].id);
         res
-            .status(201)
             .cookie("jwt", token, {
                 httpOnly: true,
                 maxAge: 24 * 60 * 60 * 1000,
@@ -89,8 +84,7 @@ const login = async(req, res) => {
                 sameSite: "none",
                 secure: true
             })
-            .json({ user_id: user.rows[0].id })
-            .send();
+            .json({ user_id: user.rows[0].id }).status(201).send();
     } catch (error) {
         res.status(401).json({ error: error.message });
     }
