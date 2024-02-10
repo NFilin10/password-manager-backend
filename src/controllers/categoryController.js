@@ -3,7 +3,6 @@ const pool = require("../database");
 
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET
-const maxAge = 60 * 600;
 
 const decodeJWT = (token) => {
     try {

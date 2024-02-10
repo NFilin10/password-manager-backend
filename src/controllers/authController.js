@@ -34,7 +34,7 @@ const authenticate = async (req, res) => {
 
 const signup = async(req, res) => {
     try {
-        const {login, email, password } = req.body;
+        const {name, surname, email, password } = req.body;
 
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (user.rows.length !== 0) return res.status(401).json({ error: "User is already registered" });
@@ -42,9 +42,9 @@ const signup = async(req, res) => {
         const salt = await bcrypt.genSalt();
         const bcryptPassword = await bcrypt.hash(password, salt)
         const authUser = await pool.query(
-            "INSERT INTO users(username, email, password) values ($1, $2, $3) RETURNING*", [login, email, bcryptPassword]
+            "INSERT INTO users(name, surname, email, password) values ($1, $2, $3, $4) RETURNING*", [name, surname, email, bcryptPassword]
         );
-        const token = await generateJWT(authUser.rows[0].id); // generates a JWT by taking the user id as an input (payload)
+        const token = await generateJWT(authUser.rows[0].id);
         res
             .cookie("jwt", token, {
                 httpOnly: true,
