@@ -48,6 +48,8 @@ const upload = multer({
 
 const signup = async (req, res) => {
     try {
+
+        console.log(req.body)
         // Extract user details from request body
         const { name, surname, email, password } = req.body;
 
