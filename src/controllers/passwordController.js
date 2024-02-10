@@ -106,7 +106,7 @@ const getPasswords = async (req, res) => {
         res.json(Object.values(groupedPasswords));
     } catch (error) {
         console.error('Error fetching passwords:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: error });
     }
 }
 
