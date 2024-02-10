@@ -84,12 +84,16 @@ const login = async(req, res) => {
     }
 };
 
+// const logout = async (req, res) => {
+//     res.status(202).clearCookie('jwt').json({ "Msg": "cookie cleared" }).send(); // <-- Corrected
+// };
+
 const logout = async (req, res) => {
     res.clearCookie("jwt", {
         secure: true,
         httpOnly: true,
         sameSite: "none"
-    }).status(200).send("User has been logged out.")
+    }).status(200).json({ "Msg": "cookie cleared" })
 };
 
 
