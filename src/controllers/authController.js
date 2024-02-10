@@ -85,10 +85,10 @@ const login = async(req, res) => {
 };
 
 const logout = async (req, res) => {
-    res.clearCookie("jwt", {
+    res.clearCookie("accessToken", {
         secure: true,
         httpOnly: true,
-        sameSite: true
+        sameSite: "none"
     }).status(200).send("User has been logged out.")
 };
 
