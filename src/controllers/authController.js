@@ -54,7 +54,7 @@ const signup = async(req, res) => {
                 sameSite: "none",
                 secure: true
             })
-            .json({ user_id: user.rows[0].id }).status(201).send();
+            .status(201).send();
     } catch (err) {
         console.error(err.message);
         res.status(400).send(err.message);
