@@ -1,11 +1,11 @@
 const pool = require("../database");
 const express = require('express');
-
+const multer = require('multer');
+const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const multer = require('multer');
-const path = require('path');
+
 
 const secret = process.env.SECRET
 const maxAge = 24 * 60 * 60 * 1000;
@@ -33,6 +33,8 @@ const authenticate = async (req, res) => {
 };
 
 
+
+// Multer setup for image upload
 const storage = multer.diskStorage({
     destination: './uploads/',
     filename: function(req, file, cb) {
@@ -125,9 +127,6 @@ const logout = async (req, res) => {
         sameSite: "none"
     }).status(200).json({ "Msg": "cookie cleared" })
 };
-
-
-
 
 
 
