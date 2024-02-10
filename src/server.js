@@ -4,6 +4,7 @@ const cors = require('cors')
 const passwordsRoute = require('./routes/passwords.route')
 const authRoute = require('./routes/auth.route')
 const categoryRoute = require('./routes/category.route')
+const userRoute = require('./routes/user.route')
 require('dotenv').config();
 
 const cookieParser = require('cookie-parser');
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use('/', passwordsRoute);
 app.use('/auth/', authRoute);
 app.use('/', categoryRoute);
+app.use('/', userRoute);
 
 
 
