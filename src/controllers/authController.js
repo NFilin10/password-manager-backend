@@ -44,6 +44,7 @@ const signup = async(req, res) => {
         const authUser = await pool.query(
             "INSERT INTO users(name, surname, email, password) values ($1, $2, $3, $4) RETURNING*", [name, surname, email, bcryptPassword]
         );
+        console.log("auth user", authUser.rows[0])
         const token = await generateJWT(authUser.rows[0].id);
         res
             .cookie("jwt", token, {

@@ -25,7 +25,7 @@ const getUser = async (req, res) => {
     );
 
     res.json(user.rows);
-    console.log("HERE", user.rows)
+    console.log("USER", user.rows)
 }
 
 
