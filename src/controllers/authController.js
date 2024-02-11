@@ -46,24 +46,22 @@ const upload = multer({
 
 const signup = async (req, res) => {
     try {
-        // Extract user details from request body
-        const { name, surname, email, password } = req.body;
-
-        // Check if user already exists
-        const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-        if (user.rows.length !== 0) return res.status(401).json({ error: "User is already registered" });
-
-        // Hash password
-        const salt = await bcrypt.genSalt();
-        const bcryptPassword = await bcrypt.hash(password, salt);
-
-        // Upload image and insert user data into database
         upload(req, res, async (err) => {
             if (err) {
                 console.error(err.message);
                 return res.status(500).json({ error: err.message });
             } else {
+                console.log("body", req.body)
+                const { name, surname, email, password } = req.body;
                 const image = req.file ? req.file.filename : null;
+
+                // Check if user already exists
+                const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+                if (user.rows.length !== 0) return res.status(401).json({ error: "User is already registered" });
+
+                // Hash password
+                const salt = await bcrypt.genSalt();
+                const bcryptPassword = await bcrypt.hash(password, salt);
 
                 // Insert user data into database
                 const authUser = await pool.query(
@@ -89,6 +87,7 @@ const signup = async (req, res) => {
         res.status(400).send(err.message);
     }
 };
+
 
 const login = async(req, res) => {
     try {
