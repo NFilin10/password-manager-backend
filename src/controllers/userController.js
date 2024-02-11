@@ -34,7 +34,7 @@ const getUser = async (req, res) => {
     const userID = decodeJWT(token)
 
     const user = await pool.query(
-        `SELECT name, surname FROM users WHERE id=$1`,
+        `SELECT name, surname, image FROM users WHERE id=$1`,
         [userID]
     );
 
