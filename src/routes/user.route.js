@@ -6,7 +6,7 @@ const authenticateMiddleware = require('./../middlewares/authenticate.middleware
 const router = express.Router()
 
 router.get('/user', authenticateMiddleware, getUser)
-// router.get('/:id');
+router.get(/^\/image.*/, authenticateMiddleware);
 
 
 
