@@ -4,7 +4,8 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
+const multer = require('multer');
+const path = require('path');
 
 const secret = process.env.SECRET
 const maxAge = 24 * 60 * 60 * 1000;
@@ -32,28 +33,57 @@ const authenticate = async (req, res) => {
 };
 
 
-const signup = async(req, res) => {
-    try {
-        const {name, surname, email, password } = req.body;
+const storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: function(req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
+});
 
+const upload = multer({
+    storage: storage
+}).single('image');
+
+const signup = async (req, res) => {
+    try {
+        // Extract user details from request body
+        const { name, surname, email, password } = req.body;
+
+        // Check if user already exists
         const user = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
         if (user.rows.length !== 0) return res.status(401).json({ error: "User is already registered" });
 
+        // Hash password
         const salt = await bcrypt.genSalt();
-        const bcryptPassword = await bcrypt.hash(password, salt)
-        const authUser = await pool.query(
-            "INSERT INTO users(name, surname, email, password) values ($1, $2, $3, $4) RETURNING*", [name, surname, email, bcryptPassword]
-        );
-        const token = await generateJWT(authUser.rows[0].id);
-        res
-            .cookie("jwt", token, {
-                httpOnly: true,
-                maxAge: maxAge,
-                overwrite: true,
-                sameSite: "none",
-                secure: true
-            })
-            .status(201).send();
+        const bcryptPassword = await bcrypt.hash(password, salt);
+
+        // Upload image and insert user data into database
+        upload(req, res, async (err) => {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).json({ error: err.message });
+            } else {
+                const image = req.file ? req.file.filename : null;
+
+                // Insert user data into database
+                const authUser = await pool.query(
+                    "INSERT INTO users(name, surname, email, password, image) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+                    [name, surname, email, bcryptPassword, image]
+                );
+
+                // Generate JWT token
+                const token = await generateJWT(authUser.rows[0].id);
+
+                // Set JWT token in cookie
+                res.cookie("jwt", token, {
+                    httpOnly: true,
+                    maxAge: maxAge,
+                    overwrite: true,
+                    sameSite: "none",
+                    secure: true
+                }).status(201).send();
+            }
+        });
     } catch (err) {
         console.error(err.message);
         res.status(400).send(err.message);
