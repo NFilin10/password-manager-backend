@@ -79,7 +79,7 @@ const signup = async (req, res) => {
                     overwrite: true,
                     sameSite: "none",
                     secure: true
-                }).status(201).send();
+                }).status(201).json({token: token});
             }
         });
     } catch (err) {
