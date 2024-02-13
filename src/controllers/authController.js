@@ -107,7 +107,7 @@ const login = async(req, res) => {
                 sameSite: "none",
                 secure: true
             })
-            .status(201).json({ user_id: user.rows[0].id });
+            .status(200).json({ user_id: user.rows[0].id, token: token});
     } catch (error) {
         res.status(401).json({ error: error.message });
     }
